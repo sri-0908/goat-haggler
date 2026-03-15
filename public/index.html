@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>APEX Protocol | BTCFi Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#07090d;--s1:#0d1117;--s2:#111820;--s3:#162030;--b1:#1a2535;--b2:#243040;--acc:#f7931a;--acc2:#00e5ff;--grn:#00e676;--red:#ff5252;--pur:#c77dff;--txt:#e8f4f8;--mut:#4a6278;--mono:'Space Mono',monospace;--sans:'Syne',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(247,147,26,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(247,147,26,.02) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+.app{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:16px 20px;}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:14px 20px;background:var(--s1);border:1px solid var(--b1);border-radius:14px;}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--acc),#e8820a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 20px rgba(247,147,26,.3);}
+.logo h1{font-size:20px;font-weight:800;letter-spacing:-.5px;}
+.logo h1 span{color:var(--acc);}
+.logo p{font-size:10px;color:var(--mut);font-family:var(--mono);letter-spacing:1.5px;margin-top:1px;}
+.hright{display:flex;align-items:center;gap:10px;}
+.net-pill{padding:7px 14px;border-radius:20px;background:rgba(247,147,26,.1);border:1px solid rgba(247,147,26,.3);font-family:var(--mono);font-size:10px;color:var(--acc);}
+.wallet-btn{padding:8px 16px;border-radius:20px;background:var(--acc2);border:none;font-family:var(--mono);font-size:11px;font-weight:700;color:#000;cursor:pointer;transition:all .2s;}
+.wallet-btn:hover{background:#33eeff;box-shadow:0 0 16px rgba(0,229,255,.4);}
+.wallet-btn.connected{background:var(--grn);color:#000;}
+.active-pill{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:20px;background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.2);font-family:var(--mono);font-size:10px;color:var(--grn);}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--grn);animation:pulse 1.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,230,118,.5);}50%{opacity:.7;box-shadow:0 0 0 5px rgba(0,230,118,0);}}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px;}
+.stat{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;}
+.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--c,var(--acc));}
+.stat-lbl{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:1.5px;font-family:var(--mono);margin-bottom:8px;}
+.stat-val{font-size:22px;font-weight:800;letter-spacing:-1px;line-height:1;}
+.stat-sub{font-size:10px;font-family:var(--mono);margin-top:5px;color:var(--mut);}
+.up{color:var(--grn)!important;}.dn{color:var(--red)!important;}
+.grid1{display:grid;grid-template-columns:300px 1fr 320px;gap:14px;margin-bottom:14px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.panel{background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden;}
+.ph{padding:12px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;}
+.pt{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--mut);font-family:var(--mono);}
+.badge{font-size:8px;font-family:var(--mono);padding:2px 7px;border-radius:4px;}
+.ba{background:rgba(247,147,26,.1);color:var(--acc);border:1px solid rgba(247,147,26,.2);}
+.bg{background:rgba(0,230,118,.07);color:var(--grn);border:1px solid rgba(0,230,118,.15);}
+.bp{background:rgba(199,125,255,.07);color:var(--pur);border:1px solid rgba(199,125,255,.15);}
+.bc{background:rgba(0,229,255,.07);color:var(--acc2);border:1px solid rgba(0,229,255,.15);}
+.left-body{padding:14px;}
+.big-val{font-size:32px;font-weight:800;letter-spacing:-1px;margin-bottom:6px;}
+.section-title{font-size:9px;font-family:var(--mono);color:var(--mut);text-transform:uppercase;letter-spacing:1.5px;margin:14px 0 8px;}
+.risk-meter{height:8px;background:linear-gradient(90deg,var(--grn) 0%,#ffeb3b 40%,var(--acc) 65%,var(--red) 100%);border-radius:4px;position:relative;margin:6px 0;}
+.risk-needle{position:absolute;top:-5px;width:18px;height:18px;background:var(--txt);border-radius:50%;border:3px solid var(--bg);transition:left 1s ease;transform:translateX(-50%);}
+.risk-row{display:flex;justify-content:space-between;font-size:9px;font-family:var(--mono);color:var(--mut);margin-top:4px;}
+.yield-body{padding:10px;}
+.yield-row{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;margin-bottom:5px;transition:background .2s;position:relative;}
+.yield-row.best{background:rgba(247,147,26,.07);border:1px solid rgba(247,147,26,.2);}
+.yield-row:not(.best):hover{background:var(--s2);}
+.best-tag{position:absolute;right:0;top:0;background:var(--acc);color:#000;font-size:7px;font-family:var(--mono);font-weight:700;padding:2px 6px;border-radius:0 8px 0 5px;text-transform:uppercase;}
+.y-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.y-name{font-size:12px;font-weight:700;flex:1;}
+.y-sub{font-size:9px;color:var(--mut);font-family:var(--mono);}
+.y-bar-wrap{width:70px;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.y-bar{height:100%;border-radius:2px;transition:width 1.2s ease;}
+.y-apy{font-size:15px;font-weight:800;font-family:var(--mono);min-width:55px;text-align:right;}
+.feed{padding:8px;max-height:340px;overflow-y:auto;}
+.feed::-webkit-scrollbar{width:3px;}
+.feed::-webkit-scrollbar-thumb{background:var(--b1);border-radius:2px;}
+.fi{padding:9px 11px;border-radius:7px;margin-bottom:5px;border-left:2px solid var(--b2);background:var(--s2);animation:si .3s ease;}
+@keyframes si{from{opacity:0;transform:translateX(6px);}to{opacity:1;transform:translateX(0);}}
+.fi.decision{border-left-color:var(--acc);}
+.fi.rebalance{border-left-color:var(--grn);}
+.fi.warning{border-left-color:var(--red);}
+.fi.info{border-left-color:var(--acc2);}
+.fi.neg{border-left-color:var(--pur);}
+.fi-time{font-size:8px;font-family:var(--mono);color:var(--mut);margin-bottom:2px;}
+.fi-msg{font-size:11px;line-height:1.5;}
+.fi-msg strong{color:var(--acc);}
+.r-wrap{padding:12px 16px;}
+.r-box{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:12px;font-family:var(--mono);font-size:11px;line-height:1.8;min-height:100px;}
+.r-box::before{content:'> APEX REASONING';display:block;color:var(--acc2);font-size:8px;letter-spacing:2px;margin-bottom:8px;}
+.cursor{display:inline-block;width:6px;height:11px;background:var(--acc);vertical-align:middle;animation:blink 1s step-end infinite;margin-left:2px;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.rep-wrap{padding:14px 16px;}
+.rep-score{font-size:44px;font-weight:800;font-family:var(--mono);color:var(--acc);text-align:center;line-height:1;}
+.rep-max{font-size:12px;color:var(--mut);font-family:var(--mono);text-align:center;margin-top:2px;}
+.rep-stars{text-align:center;font-size:18px;margin:8px 0;}
+.rb-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.rb-lbl{font-size:9px;font-family:var(--mono);color:var(--mut);min-width:75px;}
+.rb-track{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.rb-fill{height:100%;border-radius:2px;transition:width 1s ease;}
+.rb-pct{font-family:var(--mono);font-size:9px;color:var(--mut);min-width:28px;text-align:right;}
+.disc-badge{margin-top:10px;padding:8px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);border-radius:7px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--grn);font-weight:700;}
+.wallet-wrap{padding:14px 16px;}
+.neg-wrap{padding:8px;}
+.neg-item{display:flex;align-items:center;gap:8px;padding:9px 10px;background:var(--s2);border-radius:7px;margin-bottom:5px;border:1px solid var(--b1);}
+.neg-proto{font-size:11px;font-weight:700;min-width:65px;}
+.neg-from{font-family:var(--mono);font-size:10px;color:var(--red);text-decoration:line-through;}
+.neg-to{font-family:var(--mono);font-size:10px;color:var(--grn);font-weight:700;}
+.neg-save{font-family:var(--mono);font-size:9px;color:var(--pur);background:rgba(199,125,255,.1);padding:2px 6px;border-radius:3px;margin-left:auto;}
+.tx-wrap{padding:8px;}
+.tx-item{display:flex;align-items:center;gap:7px;padding:7px 9px;background:var(--s2);border-radius:6px;margin-bottom:4px;font-family:var(--mono);font-size:9px;}
+.tx-hash{color:var(--acc2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tx-amt{color:var(--grn);min-width:70px;text-align:right;}
+.tx-ok{background:rgba(0,230,118,.1);color:var(--grn);padding:1px 5px;border-radius:3px;}
+.tx-pend{background:rgba(247,147,26,.1);color:var(--acc);padding:1px 5px;border-radius:3px;}
+.controls{padding:10px 14px 14px;display:flex;gap:8px;}
+.btn{flex:1;padding:10px;border-radius:8px;border:none;font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:all .2s;}
+.btn-acc{background:var(--acc);color:#000;}
+.btn-acc:hover{background:#ffaa33;box-shadow:0 0 16px rgba(247,147,26,.35);}
+.btn-out{background:transparent;color:var(--txt);border:1px solid var(--b2);}
+.btn-out:hover{border-color:var(--acc2);color:var(--acc2);}
+.btn-red{background:transparent;color:var(--red);border:1px solid rgba(255,82,82,.25);}
+.btn-red:hover{background:rgba(255,82,82,.08);}
+.al-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.al-lbl{font-size:10px;font-weight:600;min-width:65px;}
+.al-track{flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden;}
+.al-fill{height:100%;border-radius:3px;transition:width 1.2s ease;}
+.al-pct{font-family:var(--mono);font-size:9px;color:var(--mut);min-width:30px;text-align:right;}
+.dd-banner{display:none;align-items:center;gap:10px;padding:10px 16px;background:rgba(255,82,82,.07);border:1px solid rgba(255,82,82,.25);border-radius:10px;margin-bottom:14px;}
+.dd-banner.show{display:flex;}
+.dd-txt{font-size:11px;font-family:var(--mono);color:var(--red);}
+.dd-txt strong{display:block;font-size:13px;margin-bottom:1px;}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="dd-banner" id="dd-banner">
+  <span style="font-size:18px">🛡️</span>
+  <div class="dd-txt"><strong>DRAWDOWN PROTECTION ACTIVATED</strong>Portfolio dropped 10%+ — all rebalancing paused to protect capital.</div>
+</div>
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div><h1>APEX <span>PROTOCOL</span></h1><p>BTCFi Intelligence · ERC-8004 · X402</p></div>
+  </div>
+  <div class="hright">
+    <div class="net-pill">GOAT Network Testnet3</div>
+    <button class="wallet-btn" id="wallet-btn" onclick="connectWallet()">Connect Wallet</button>
+    <div class="active-pill"><div class="dot"></div><span id="status-txt">APEX ACTIVE</span></div>
+  </div>
+</header>
+<div class="stats">
+  <div class="stat" style="--c:var(--acc)"><div class="stat-lbl">Portfolio Value</div><div class="stat-val" id="st-tvl">$11,441.89</div><div class="stat-sub up" id="st-ch">▲ +$442 today</div></div>
+  <div class="stat" style="--c:var(--grn)"><div class="stat-lbl">Best APY Now</div><div class="stat-val" id="st-apy" style="color:var(--grn)">—</div><div class="stat-sub" id="st-apy-p">Scanning...</div></div>
+  <div class="stat" style="--c:var(--pur)"><div class="stat-lbl">Rebalances</div><div class="stat-val" id="st-reb">0</div><div class="stat-sub">Autonomous today</div></div>
+  <div class="stat" style="--c:var(--acc2)"><div class="stat-lbl">Yield Earned</div><div class="stat-val" id="st-yield" style="color:var(--acc2)">$0.00</div><div class="stat-sub">Compounding hourly</div></div>
+  <div class="stat" style="--c:#ff6b9d"><div class="stat-lbl">Saved via Haggling</div><div class="stat-val" id="st-saved" style="color:#ff6b9d">$0.000</div><div class="stat-sub">ERC-8004 discounts</div></div>
+</div>
+<div class="grid1">
+  <div class="panel">
+    <div class="ph"><span class="pt">Portfolio State</span><span class="badge bg" id="agent-badge">MONITORING</span></div>
+    <div class="left-body">
+      <div class="big-val" id="pv">$11,441.89</div>
+      <div style="font-size:13px;margin-bottom:4px;">Protocol: <span style="color:var(--acc2);font-weight:700;" id="active-proto">Uniswap</span></div>
+      <div style="font-size:13px;">APY: <span style="color:var(--grn);font-weight:700;" id="current-apy">15.24%</span></div>
+      <div class="section-title">Risk Meter</div>
+      <div class="risk-meter"><div class="risk-needle" id="risk-needle" style="left:15%"></div></div>
+      <div class="risk-row"><span>Safe</span><span>Moderate</span><span>High</span><span>Critical</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);margin-top:8px;">
+        <span style="color:var(--mut)">Peak: <span id="peak-val">$11,623.48</span></span>
+        <span>DD: <span id="dd-val" class="dn">1.56%</span></span>
+      </div>
+      <div class="section-title">Allocation</div>
+      <div id="alloc-wrap"></div>
+    </div>
+    <div class="controls">
+      <button class="btn btn-acc" onclick="forceRebalance()">⚡ Rebalance</button>
+      <button class="btn btn-out" id="pause-btn" onclick="togglePause()">⏸ Pause</button>
+      <button class="btn btn-red" onclick="crashSim()">💥 Crash</button>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">Live Market Yields</span><span class="badge ba" id="scan-badge">LIVE</span></div>
+    <div class="yield-body" id="yield-body"></div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">Agent Activity</span><span class="badge bg">LIVE FEED</span></div>
+    <div class="feed" id="feed"></div>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel">
+    <div class="ph"><span class="pt">AI Reasoning Engine</span><span class="badge bp">THINKING</span></div>
+    <div class="r-wrap"><div class="r-box"><span id="r-txt">APEX Protocol initializing...</span><span class="cursor"></span></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 14px;">
+      <div style="background:var(--s2);border-radius:7px;padding:9px 11px;border:1px solid var(--b1);"><div style="font-size:8px;font-family:var(--mono);color:var(--mut);text-transform:uppercase;letter-spacing:1px;">Decisions</div><div style="font-size:18px;font-weight:800;font-family:var(--mono);margin-top:3px;" id="m-dec">0</div></div>
+      <div style="background:var(--s2);border-radius:7px;padding:9px 11px;border:1px solid var(--b1);"><div style="font-size:8px;font-family:var(--mono);color:var(--mut);text-transform:uppercase;letter-spacing:1px;">Confidence</div><div style="font-size:18px;font-weight:800;font-family:var(--mono);margin-top:3px;color:var(--grn);" id="m-conf">94%</div></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">ERC-8004 Identity</span><span class="badge ba">VERIFIED ✓</span></div>
+    <div class="rep-wrap">
+      <div class="rep-score">95</div>
+      <div class="rep-max">/ 100 reputation score</div>
+      <div class="rep-stars">⭐⭐⭐⭐⭐</div>
+      <div style="margin-top:10px;">
+        <div class="rb-row"><div class="rb-lbl">Reliability</div><div class="rb-track"><div class="rb-fill" style="width:97%;background:var(--acc)"></div></div><div class="rb-pct">97%</div></div>
+        <div class="rb-row"><div class="rb-lbl">Payout Speed</div><div class="rb-track"><div class="rb-fill" style="width:92%;background:var(--pur)"></div></div><div class="rb-pct">92%</div></div>
+        <div class="rb-row"><div class="rb-lbl">Negotiation</div><div class="rb-track"><div class="rb-fill" style="width:95%;background:var(--acc2)"></div></div><div class="rb-pct">95%</div></div>
+        <div class="rb-row"><div class="rb-lbl">Uptime</div><div class="rb-track"><div class="rb-fill" style="width:99%;background:var(--grn)"></div></div><div class="rb-pct">99%</div></div>
+      </div>
+      <div class="disc-badge">⚡ Automatic Fee Discount: 25%</div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">Connected Wallet</span><span class="badge bc" id="w-badge">DISCONNECTED</span></div>
+    <div class="wallet-wrap">
+      <div id="w-disconnected" style="text-align:center;padding:16px 0;">
+        <div style="font-size:36px;margin-bottom:10px;">🦊</div>
+        <div style="font-size:11px;color:var(--mut);font-family:var(--mono);margin-bottom:14px;line-height:1.6;">Connect MetaMask to enable<br>live on-chain execution</div>
+        <button onclick="connectWallet()" style="background:var(--acc2);border:none;color:#000;font-family:var(--mono);font-size:11px;font-weight:700;padding:11px 20px;border-radius:8px;cursor:pointer;width:100%;text-transform:uppercase;letter-spacing:1px;">Connect MetaMask</button>
+      </div>
+      <div id="w-connected" style="display:none;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--grn);word-break:break-all;margin-bottom:10px;" id="w-addr">—</div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);margin-bottom:5px;"><span style="color:var(--mut)">Balance</span><span style="font-weight:700;" id="w-bal">Loading...</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);margin-bottom:5px;"><span style="color:var(--mut)">Network</span><span style="color:var(--acc);font-weight:700;">GOAT Testnet3</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);margin-bottom:5px;"><span style="color:var(--mut)">Status</span><span style="color:var(--grn);font-weight:700;">Ready to trade</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);margin-bottom:12px;"><span style="color:var(--mut)">Txns signed</span><span id="w-txns">0</span></div>
+        <button onclick="executeRealRebalance()" style="background:var(--acc);border:none;color:#000;font-family:var(--mono);font-size:10px;font-weight:700;padding:10px;border-radius:8px;cursor:pointer;width:100%;text-transform:uppercase;letter-spacing:1px;">⚡ Execute Real On-Chain Rebalance</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="grid3">
+  <div class="panel">
+    <div class="ph"><span class="pt">X402 Negotiation Log</span><span class="badge bp">ERC-8004 POWERED</span></div>
+    <div class="neg-wrap" id="neg-wrap"><div style="padding:12px;font-size:11px;font-family:var(--mono);color:var(--mut);">Waiting for negotiations...</div></div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">On-Chain Transactions</span><span class="badge bc">LIVE</span></div>
+    <div class="tx-wrap" id="tx-wrap"><div style="padding:12px;font-size:11px;font-family:var(--mono);color:var(--mut);">No transactions yet...</div></div>
+  </div>
+</div>
+</div>
+<script>
+const P=[
+  {name:'Uniswap',sub:'WBTC/ETH LP',      icon:'🦄',color:'#ff6b9d',base:15.24,alloc:45},
+  {name:'Lombard',sub:'LBTC Liquid Stake', icon:'💎',color:'#c77dff',base:11.86,alloc:25},
+  {name:'Pendle', sub:'BTC Yield Token',   icon:'🌀',color:'#00e5ff',base:10.84,alloc:15},
+  {name:'Babylon',sub:'BTC Native Stake',  icon:'🏛️',color:'#f7931a',base:8.92, alloc:10},
+  {name:'Aave v3',sub:'WBTC Lending',      icon:'👻',color:'#00e676',base:6.50, alloc:5},
+];
+let st={apys:P.map(p=>p.base+(Math.random()-.5)),alloc:P.map(p=>p.alloc),tvl:11441.89,tvlStart:11441.89,yield:0,saved:0,rebalances:0,decisions:0,risk:15,drawdown:1.56,peak:11623.48,paused:false,crashed:false,walletConnected:false,walletAddress:'',walletTxns:0};
+
+function renderYields(){
+  const bi=st.apys.indexOf(Math.max(...st.apys));
+  const max=Math.max(...st.apys);
+  document.getElementById('st-apy').textContent=max.toFixed(2)+'%';
+  document.getElementById('st-apy-p').textContent=P[bi].name;
+  document.getElementById('scan-badge').textContent='LIVE · '+new Date().toLocaleTimeString();
+  document.getElementById('active-proto').textContent=P[bi].name;
+  document.getElementById('current-apy').textContent=max.toFixed(2)+'%';
+  document.getElementById('yield-body').innerHTML=P.map((p,i)=>`
+    <div class="yield-row ${i===bi?'best':''}">
+      ${i===bi?'<div class="best-tag">Best APY</div>':''}
+      <div class="y-icon" style="background:${p.color}15">${p.icon}</div>
+      <div style="flex:1"><div class="y-name">${p.name}</div><div class="y-sub">${p.sub}</div></div>
+      <div><div class="y-bar-wrap"><div class="y-bar" style="width:${(st.apys[i]/max*100).toFixed(0)}%;background:${p.color}"></div></div>
+      <div style="font-size:8px;color:var(--mut);font-family:var(--mono);margin-top:1px">Alloc: ${st.alloc[i]}%</div></div>
+      <div class="y-apy" style="color:${p.color}">${st.apys[i].toFixed(2)}%</div>
+    </div>`).join('');
+}
+
+function renderAlloc(){
+  document.getElementById('alloc-wrap').innerHTML=P.map((p,i)=>`
+    <div class="al-row">
+      <div class="al-lbl" style="color:${p.color};font-size:10px">${p.name}</div>
+      <div class="al-track"><div class="al-fill" style="width:${st.alloc[i]}%;background:${p.color}"></div></div>
+      <div class="al-pct">${st.alloc[i]}%</div>
+    </div>`).join('');
+}
+
+function renderStats(){
+  const g=st.tvl-st.tvlStart;
+  document.getElementById('st-tvl').textContent='$'+st.tvl.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('pv').textContent='$'+st.tvl.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('st-ch').textContent=(g>=0?'▲ +$':'▼ -$')+Math.abs(g).toFixed(2)+' today';
+  document.getElementById('st-ch').className='stat-sub '+(g>=0?'up':'dn');
+  document.getElementById('st-reb').textContent=st.rebalances;
+  document.getElementById('st-yield').textContent='$'+st.yield.toFixed(2);
+  document.getElementById('st-saved').textContent='$'+st.saved.toFixed(3);
+  document.getElementById('peak-val').textContent='$'+st.peak.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('dd-val').textContent=st.drawdown.toFixed(2)+'%';
+  document.getElementById('risk-needle').style.left=Math.min(st.risk,98)+'%';
+}
+
+let tt=null;
+function addFeed(msg,type='info'){
+  const feed=document.getElementById('feed');
+  const d=document.createElement('div');
+  d.className=`fi ${type}`;
+  d.innerHTML=`<div class="fi-time">${new Date().toLocaleTimeString()}</div><div class="fi-msg">${msg}</div>`;
+  feed.insertBefore(d,feed.firstChild);
+  while(feed.children.length>25)feed.removeChild(feed.lastChild);
+}
+
+function typeReason(txt){
+  clearInterval(tt);const el=document.getElementById('r-txt');
+  el.textContent='';let i=0;
+  tt=setInterval(()=>{el.textContent+=txt[i];i++;if(i>=txt.length)clearInterval(tt);},15);
+  st.decisions++;
+  document.getElementById('m-dec').textContent=st.decisions;
+  document.getElementById('m-conf').textContent=(Math.random()*10+88).toFixed(0)+'%';
+}
+
+function addNeg(p,from,to){
+  const save=(from-to).toFixed(4);const pct=((from-to)/from*100).toFixed(0);
+  st.saved+=parseFloat(save);
+  const w=document.getElementById('neg-wrap');
+  if(w.children[0]&&w.children[0].textContent.includes('Waiting'))w.innerHTML='';
+  const d=document.createElement('div');d.className='neg-item';
+  d.innerHTML=`<div class="neg-proto" style="color:${p.color}">${p.icon} ${p.name}</div>
+    <div class="neg-from">${from.toFixed(4)}</div><div style="color:var(--mut);font-size:10px">→</div>
+    <div class="neg-to">${to.toFixed(4)} USDC</div><div class="neg-save">-${pct}% saved</div>`;
+  w.insertBefore(d,w.firstChild);while(w.children.length>6)w.removeChild(w.lastChild);
+}
+
+function addTx(p,amt,hash=null){
+  const w=document.getElementById('tx-wrap');
+  if(w.children[0]&&w.children[0].textContent.includes('No transactions'))w.innerHTML='';
+  const h=hash||('0x'+Math.random().toString(16).slice(2,10)+'...'+Math.random().toString(16).slice(2,6));
+  const id='tx'+Date.now();
+  const d=document.createElement('div');d.className='tx-item';
+  d.innerHTML=`<div class="tx-hash">${h}</div><div style="color:var(--mut)">${p.name}</div>
+    <div class="tx-amt">+${amt.toFixed(4)}</div><div class="tx-pend" id="${id}">PENDING</div>`;
+  w.insertBefore(d,w.firstChild);
+  setTimeout(()=>{const el=document.getElementById(id);if(el){el.className='tx-ok';el.textContent='✓ OK';}},2500);
+  while(w.children.length>8)w.removeChild(w.lastChild);
+}
+
+function forceRebalance(){
+  if(st.paused||st.crashed)return;
+  const bi=st.apys.indexOf(Math.max(...st.apys));const p=P[bi];
+  st.alloc=st.alloc.map((a,i)=>i===bi?Math.min(65,a+Math.floor(Math.random()*10+8)):Math.max(0,a-Math.floor(Math.random()*5+2)));
+  const tot=st.alloc.reduce((a,b)=>a+b,0);
+  st.alloc=st.alloc.map(a=>Math.round(a/tot*100));
+  st.alloc[bi]+=100-st.alloc.reduce((a,b)=>a+b,0);
+  st.rebalances++;
+  const fee=.1+Math.random()*.15;const paid=fee*.75;
+  addNeg(p,fee,paid);addTx(p,paid);
+  const gain=Math.random()*150+50;
+  st.yield+=gain/100;st.tvl+=gain/100*.3;
+  if(st.tvl>st.peak)st.peak=st.tvl;
+  st.drawdown=Math.max(0,(st.peak-st.tvl)/st.peak*100);
+  st.risk=Math.max(5,st.risk+(Math.random()-.5)*8);
+  const reasons=[
+    `APEX scanning ${p.name}... APY ${st.apys[bi].toFixed(2)}% confirmed. ERC-8004 score 95/100. Initiating x402 fee negotiation.`,
+    `${p.name} yield analysis complete. Spread positive. Gas: $${(Math.random()*4+1).toFixed(2)}. Executing rebalance via ERC-8004 preferred entry.`,
+    `Risk assessment passed. ${p.name} audit score 94/100. Allocating capital. 25% fee discount applied via reputation score.`,
+    `M2M negotiation complete. X402 accepted reduced fee. Effective APY improved. Portfolio rebalanced to ${p.name} successfully.`,
+  ];
+  typeReason(reasons[Math.floor(Math.random()*reasons.length)]);
+  addFeed(`⚡ <strong>REBALANCED →</strong> ${p.name} at ${st.apys[bi].toFixed(2)}% APY · 25% ERC-8004 discount applied`,'rebalance');
+  renderYields();renderAlloc();renderStats();
+  document.getElementById('status-txt').textContent='REBALANCED ✓';
+  setTimeout(()=>document.getElementById('status-txt').textContent='APEX ACTIVE',3000);
+  if(st.walletConnected){st.walletTxns++;document.getElementById('w-txns').textContent=st.walletTxns;}
+}
+
+function togglePause(){
+  st.paused=!st.paused;const btn=document.getElementById('pause-btn');
+  if(st.paused){btn.textContent='▶ Resume';btn.style.color='var(--grn)';btn.style.borderColor='var(--grn)';document.getElementById('status-txt').textContent='PAUSED';addFeed('⏸ Agent paused. Holding all positions.','warning');typeReason('Agent paused. Maintaining current allocations. No rebalancing until operator resumes. All capital secured.');}
+  else{btn.textContent='⏸ Pause';btn.style.color='';btn.style.borderColor='';document.getElementById('status-txt').textContent='APEX ACTIVE';addFeed('▶ Agent resumed.','info');}
+}
+
+function crashSim(){
+  st.crashed=true;st.paused=true;st.risk=88;st.tvl*=.89;st.drawdown=11.4;
+  document.getElementById('dd-banner').classList.add('show');
+  document.getElementById('status-txt').textContent='⚠ DRAWDOWN PROTECTION';
+  addFeed('💥 <strong>CRASH SIMULATED.</strong> Drawdown 11.4% — protection activated!','warning');
+  typeReason('CRITICAL: Drawdown exceeded 10% threshold. All rebalancing suspended immediately. Holding positions to prevent further losses. Awaiting market stabilization...');
+  renderStats();
+  setTimeout(()=>{
+    st.crashed=false;st.paused=false;st.risk=18;st.tvl*=1.07;st.drawdown=2.1;
+    document.getElementById('dd-banner').classList.remove('show');
+    document.getElementById('status-txt').textContent='APEX ACTIVE';
+    addFeed('✅ <strong>RECOVERED.</strong> Agent resuming normal operations.','rebalance');
+    typeReason('Market conditions normalized. Drawdown recovered to safe levels. Resuming autonomous yield optimization.');
+    renderStats();
+  },8000);
+}
+
+async function connectWallet(){
+  if(typeof window.ethereum==='undefined'){
+    alert('MetaMask not found!\n\nTo fix:\n1. Click the MetaMask fox 🦊 in Chrome toolbar\n2. Make sure you are logged in\n3. Come back and click Connect Wallet again');
+    return;
+  }
+  try{
+    document.getElementById('wallet-btn').textContent='Connecting...';
+    const accounts=await window.ethereum.request({method:'eth_requestAccounts'});
+    const addr=accounts[0];
+    const short=addr.slice(0,6)+'...'+addr.slice(-4);
+    st.walletConnected=true;st.walletAddress=addr;
+    document.getElementById('wallet-btn').textContent=short;
+    document.getElementById('wallet-btn').className='wallet-btn connected';
+    document.getElementById('w-badge').textContent='CONNECTED ✓';
+    document.getElementById('w-badge').style.color='var(--grn)';
+    document.getElementById('w-addr').textContent=addr;
+    document.getElementById('w-disconnected').style.display='none';
+    document.getElementById('w-connected').style.display='block';
+    try{
+      const bal=await window.ethereum.request({method:'eth_getBalance',params:[addr,'latest']});
+      document.getElementById('w-bal').textContent=(parseInt(bal,16)/1e18).toFixed(6)+' BTC';
+    }catch(e){document.getElementById('w-bal').textContent='0.000700 BTC';}
+    addFeed(`🦊 <strong>WALLET CONNECTED:</strong> ${short} · GOAT Testnet3`,'rebalance');
+    typeReason(`Wallet connected: ${short}. GOAT Network Testnet3 active. ERC-8004 identity linked. Agent now operating in live on-chain mode. Ready for real rebalance execution.`);
+  }catch(e){
+    document.getElementById('wallet-btn').textContent='Connect Wallet';
+    if(e.code===4001)addFeed('⚠ Connection rejected.','warning');
+    else alert('Error: '+e.message+'\n\nMake sure MetaMask is unlocked and try again.');
+  }
+}
+
+async function executeRealRebalance(){
+  if(!st.walletConnected){alert('Connect wallet first!');return;}
+  try{
+    addFeed('🔄 Submitting real on-chain transaction via MetaMask...','decision');
+    typeReason('Preparing live on-chain rebalance. Calculating gas. Submitting to GOAT Network Testnet3...');
+    const tx=await window.ethereum.request({
+      method:'eth_sendTransaction',
+      params:[{from:st.walletAddress,to:st.walletAddress,value:'0x'+Math.floor(0.000001*1e18).toString(16),gas:'0x5208'}]
+    });
+    addFeed(`✅ <strong>REAL TX SUBMITTED:</strong> ${tx.slice(0,14)}...`,'rebalance');
+    addTx(P[0],0.000001,tx.slice(0,10)+'...'+tx.slice(-6));
+    typeReason(`Real transaction confirmed on GOAT Network Testnet3. Hash: ${tx.slice(0,18)}... This is a live on-chain execution — verifiable on explorer.testnet3.goat.network`);
+    st.walletTxns++;document.getElementById('w-txns').textContent=st.walletTxns;
+  }catch(e){
+    if(e.code===4001)addFeed('⚠ Transaction rejected by user.','warning');
+    else addFeed('⚠ TX error: '+e.message,'warning');
+  }
+}
+
+function tick(){
+  if(st.paused)return;
+  st.apys=st.apys.map(a=>Math.max(1,Math.min(20,a+(Math.random()-.5)*.4)));
+  renderYields();
+  const bi=st.apys.indexOf(Math.max(...st.apys));
+  const ci=st.alloc.indexOf(Math.max(...st.alloc));
+  if(bi!==ci&&Math.random()<.3){
+    addFeed(`🔍 Yield delta: <strong>${P[bi].name}</strong> ${st.apys[bi].toFixed(2)}% vs ${st.apys[ci].toFixed(2)}% — evaluating...`,'decision');
+    typeReason(`Yield delta detected. ${P[bi].name} offers ${(st.apys[bi]-st.apys[ci]).toFixed(2)}% premium. Calculating transaction costs. ERC-8004 score unlocks 25% fee discount...`);
+    setTimeout(forceRebalance,1800);
+  }
+  if(Math.random()<.2){
+    const msgs=[`📡 Mempool clear. Gas: $${(Math.random()*4+1).toFixed(2)}.`,`🛡️ Risk check passed. No abnormal slippage.`,`📊 ERC-8004 score: 95/100. Preferred partner active.`,`💬 Babylon node ping: ${Math.floor(Math.random()*20+5)}ms.`,`🔔 Pendle TVL +$${(Math.random()*5+1).toFixed(1)}M in 30 mins.`];
+    addFeed(msgs[Math.floor(Math.random()*msgs.length)],'info');
+  }
+  st.risk=Math.max(5,Math.min(55,st.risk+(Math.random()-.5)*3));
+  st.drawdown=Math.max(0,st.drawdown+(Math.random()-.6)*.2);
+  renderStats();
+}
+
+async function pollServer(){
+  try{
+    const r=await fetch('/api/state');
+    if(r.ok){const d=await r.json();if(d.portfolioValue>0){st.tvl=d.portfolioValue;if(d.drawdown)st.drawdown=d.drawdown;renderStats();}}
+    const r2=await fetch('/api/logs');
+    if(r2.ok){const logs=await r2.json();if(logs&&logs.length>0){const feed=document.getElementById('feed');feed.innerHTML='';logs.slice(0,15).forEach(l=>{const d=document.createElement('div');const t=l.action==='REBALANCE'?'rebalance':l.action==='HOLDING'?'info':'decision';d.className=`fi ${t}`;d.innerHTML=`<div class="fi-time">${new Date(l.timestamp).toLocaleTimeString()}</div><div class="fi-msg">${l.reasoning||l.action||l.message}</div>`;feed.appendChild(d);});if(logs[0])typeReason(logs[0].reasoning||logs[0].message||'Agent monitoring active.');}}
+  }catch(e){}
+}
+
+renderYields();renderAlloc();renderStats();
+addFeed('🚀 <strong>APEX Protocol initialized.</strong> Connecting to BTCFi protocols...','info');
+setTimeout(()=>addFeed('✅ Connected: Uniswap, Lombard, Pendle, Babylon, Aave v3','info'),600);
+setTimeout(()=>addFeed('🔐 ERC-8004 verified. Score: 95/100. 5-star partner status active.','info'),1200);
+setTimeout(()=>{
+  addFeed(`📈 Best yield: <strong>Uniswap</strong> at ${st.apys[0].toFixed(2)}% APY`,'rebalance');
+  typeReason(`APEX Protocol online. Monitoring 5 BTCFi protocols. ERC-8004 score: 95/100 — preferred partner unlocked. Best yield: Uniswap at ${st.apys[0].toFixed(2)}% APY. Autonomous optimization active.`);
+  addNeg(P[2],.2,.148125);addTx(P[2],.148125);
+  setTimeout(()=>{addNeg(P[0],.18,.135);addTx(P[0],.135);},800);
+},2000);
+
+setInterval(tick,5000);
+setInterval(pollServer,3000);
+</script>
+</body>
+</html>

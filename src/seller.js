@@ -48,6 +48,46 @@ const LISTINGS = {
     minPrice:  1500000,  // 1.5 USDC
     category: 'compute',
   },
+  'yield-aave': {
+    id: 'yield-aave',
+    name: 'Aave Supply Allocation',
+    description: 'Enter Aave yield position',
+    basePrice: 200000,
+    minPrice: 100000,
+    category: 'yield'
+  },
+  'yield-babylon': {
+    id: 'yield-babylon',
+    name: 'Babylon Staking Allocation',
+    description: 'Enter Babylon yield position',
+    basePrice: 200000,
+    minPrice: 100000,
+    category: 'yield'
+  },
+  'yield-pendle': {
+    id: 'yield-pendle',
+    name: 'Pendle PT Allocation',
+    description: 'Enter Pendle yield position',
+    basePrice: 200000,
+    minPrice: 100000,
+    category: 'yield'
+  },
+  'yield-lombard': {
+    id: 'yield-lombard',
+    name: 'Lombard BTC Yield',
+    description: 'Enter Lombard yield position',
+    basePrice: 200000,
+    minPrice: 100000,
+    category: 'yield'
+  },
+  'yield-uniswap': {
+    id: 'yield-uniswap',
+    name: 'Uniswap LP APY',
+    description: 'Enter Uniswap yield position',
+    basePrice: 200000,
+    minPrice: 100000,
+    category: 'yield'
+  }
 }
 
 // Track active negotiations
