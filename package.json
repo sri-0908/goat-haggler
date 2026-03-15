@@ -4,6 +4,8 @@
   "description": "🚀 AI Auto-Haggler — M2M marketplace where agents negotiate prices using ERC-8004 reputation + x402 payments",
   "type": "module",
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/yield-dashboard.js",
     "seller": "node src/seller.js",
     "buyer": "node src/buyer.js",
     "demo": "node src/demo.js",
