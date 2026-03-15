@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>APEX Protocol | BTCFi Intelligence</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>APEX Protocol | BTCFi Intelligence Engine</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
 <style>
 :root{--bg:#07090d;--s1:#0d1117;--s2:#111820;--s3:#162030;--b1:#1a2535;--b2:#243040;--acc:#f7931a;--acc2:#00e5ff;--grn:#00e676;--red:#ff5252;--pur:#c77dff;--txt:#e8f4f8;--mut:#4a6278;--mono:'Space Mono',monospace;--sans:'Syne',sans-serif;}
@@ -11,7 +11,8 @@
 body{background:var(--bg);color:var(--txt);font-family:var(--sans);min-height:100vh;}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(247,147,26,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(247,147,26,.02) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
 .app{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:16px 20px;}
-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:14px 20px;background:var(--s1);border:1px solid var(--b1);border-radius:14px;}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:14px 20px;background:rgba(13,17,23,.8);border:1px solid var(--b1);border-radius:14px;backdrop-filter:blur(12px);position:sticky;top:10px;z-index:1000;}
+@media (max-width:768px){.grid1,.grid2,.grid3,.stats{grid-template-columns:1fr!important;}.app{padding:10px;}header{flex-direction:column;gap:12px;align-items:flex-start;}.hright{width:100%;justify-content:space-between;}}
 .logo{display:flex;align-items:center;gap:12px;}
 .logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--acc),#e8820a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 20px rgba(247,147,26,.3);}
 .logo h1{font-size:20px;font-weight:800;letter-spacing:-.5px;}
@@ -19,7 +20,7 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 .logo p{font-size:10px;color:var(--mut);font-family:var(--mono);letter-spacing:1.5px;margin-top:1px;}
 .hright{display:flex;align-items:center;gap:10px;}
 .net-pill{padding:7px 14px;border-radius:20px;background:rgba(247,147,26,.1);border:1px solid rgba(247,147,26,.3);font-family:var(--mono);font-size:10px;color:var(--acc);}
-.wallet-btn{padding:8px 16px;border-radius:20px;background:var(--acc2);border:none;font-family:var(--mono);font-size:11px;font-weight:700;color:#000;cursor:pointer;transition:all .2s;}
+.wallet-btn{padding:12px 20px;min-height:44px;min-width:44px;border-radius:20px;background:var(--acc2);border:none;font-family:var(--mono);font-size:11px;font-weight:700;color:#000;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;}
 .wallet-btn:hover{background:#33eeff;box-shadow:0 0 16px rgba(0,229,255,.4);}
 .wallet-btn.connected{background:var(--grn);color:#000;}
 .active-pill{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:20px;background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.2);font-family:var(--mono);font-size:10px;color:var(--grn);}
@@ -161,10 +162,11 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
       <div class="section-title">Allocation</div>
       <div id="alloc-wrap"></div>
     </div>
-    <div class="controls">
-      <button class="btn btn-acc" onclick="forceRebalance()">⚡ Rebalance</button>
-      <button class="btn btn-out" id="pause-btn" onclick="togglePause()">⏸ Pause</button>
-      <button class="btn btn-red" onclick="crashSim()">💥 Crash</button>
+    <div class="controls" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px;">
+      <button class="btn btn-acc" onclick="forceRebalance()" style="min-height:44px;background:var(--acc);color:#000;border:none;border-radius:8px;font-family:var(--mono);font-size:10px;font-weight:700;cursor:pointer;">⚡ REBALANCE</button>
+      <button class="btn btn-out" id="pause-btn" onclick="togglePause()" style="min-height:44px;background:var(--s3);color:var(--txt);border:1px solid var(--b1);border-radius:8px;font-family:var(--mono);font-size:10px;font-weight:700;cursor:pointer;">⏸ PAUSE</button>
+      <button class="btn btn-red" onclick="crashSim()" style="min-height:44px;background:var(--red);color:#000;border:none;border-radius:8px;font-family:var(--mono);font-size:10px;font-weight:700;cursor:pointer;">💥 CRASH</button>
+      <button class="btn btn-gold" id="prem-btn" onclick="requestPremium()" style="min-height:44px;background:linear-gradient(90deg,var(--acc),#ffd700);color:#000;border:none;border-radius:8px;font-family:var(--mono);font-size:10px;font-weight:800;cursor:pointer;">⭐ PREMIUM</button>
     </div>
   </div>
   <div class="panel">
@@ -468,6 +470,7 @@ setTimeout(()=>{
   setTimeout(()=>{addNeg(P[0],.18,.135);addTx(P[0],.135);},800);
 },2000);
 
+async function requestPremium(){try{const r=await fetch('/api/premium-rebalance');if(r.status===402){const p=r.headers.get('PAYMENT-REQUIRED');alert(`HTTP 402: Payment Required!\n\nPlease send ${p} to activate Premium Rebalance.`);const s=prompt("Enter x402 Payment Signature (X-PAYMENT):","simulated_x402_sig_demo");if(s){const vr=await fetch('/api/premium-rebalance',{headers:{'X-PAYMENT':s}});const d=await vr.json();if(d.success){alert("⭐ Premium Activated via x402 Protocol!");document.getElementById('prem-btn').style.opacity='0.5';document.getElementById('prem-btn').textContent='PREMIUM ACTIVE';document.getElementById('prem-btn').disabled=true;}}}}catch(e){console.error(e)}}
 setInterval(tick,5000);
 setInterval(pollServer,3000);
 </script>

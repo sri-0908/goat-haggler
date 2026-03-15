@@ -85,6 +85,40 @@ app.post('/api/wallet', (req, res) => {
     res.status(200).json({ success: true });
 });
 
+app.get('/api/premium-rebalance', (req, res) => {
+    const paymentSignature = req.headers['x-payment'];
+    
+    if (!paymentSignature) {
+        // Issue x402 challenge
+        res.setHeader('PAYMENT-REQUIRED', '0.0001 BTC to 0xAPEX_PREMIUM_WALLET');
+        return res.status(402).json({
+            error: 'Payment Required',
+            message: 'Premium rebalance requires a 0.0001 BTC protocol fee via x402 PayRam interface.',
+            challenge: 'x402_challenge_v1_' + Date.now()
+        });
+    }
+
+    // Verify payment signature (Simulated PayRam verification)
+    if (paymentSignature.startsWith('simulated_x402_sig')) {
+        console.log(`[x402] Payment verified for premium rebalance: ${paymentSignature}`);
+        state.premiumActive = true;
+        
+        // Log to Reasoning Stream
+        logs.unshift({
+            timestamp: new Date().toISOString(),
+            action: 'PAYMENT_VERIFIED',
+            reasoning: `⭐ [x402] Premium Payment Received (Sig: ${paymentSignature.slice(0,10)}...). Premium Rebalance Engine engaged via PayRam integration.`
+        });
+
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Premium Rebalance Activated' 
+        });
+    }
+
+    res.status(403).json({ error: 'Invalid Payment Signature' });
+});
+
 app.get('/api/logs', (req, res) => {
     if (logs.length === 0) {
         return res.json([

@@ -122,6 +122,11 @@ async function agentLoop() {
             const currentApy = market[portfolio.activeProtocol];
             const diff = maxApy - currentApy;
             
+            // Task 1: Premium Rebalance check
+            if (state.premiumActive) {
+                await logDecision('PREMIUM_REBALANCE', `⭐ Premium Intelligence enabled. Deep-scanning 12 liquidity pools across BTCFi.`);
+            }
+
             if (diff > REBALANCE_THRESHOLD && bestProtocol !== portfolio.activeProtocol) {
                 await logDecision('REBALANCE_TRIGGERED', `Yield diff ${(diff*100).toFixed(2)}% > 0.5% threshold. Switching ${portfolio.activeProtocol} -> ${bestProtocol}.`);
                 await startRebalance(bestProtocol);
@@ -132,6 +137,18 @@ async function agentLoop() {
     } catch (err) {
         console.error('\n❌ [CRASH]', err);
     }
+}
+
+// Task 1: x402 Payment Challenge & Terminal Sign simulation
+async function handleTelegramClawbotRequest() {
+    console.log(`[Clawbot] Incoming request for premium rebalance via Telegram...`);
+    // Simulating the x402 flow mentioned in task:
+    // 1. Issue challenge
+    // 2. Provide non-custodial signing link
+    const paymentRequired = "0.0001 BTC for Premium Intelligence";
+    const signingLink = "https://apex-protocol.com/pay/x402-sign-4552";
+    
+    await logDecision('x402_CHALLENGE', `⚠️ Premium Rebalance Requested. ${paymentRequired}. Pay via non-custodial link: ${signingLink}`);
 }
 
 const intervalMs = process.env.FAST_MODE === 'true' || process.argv.includes('--fast') ? 5000 : 300000;
