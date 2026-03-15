@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 app.use(express.static(join(__dirname, '../public')));
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 let logs = [];
 let state = {
     portfolioValue: 11441.89,
@@ -97,6 +97,6 @@ app.get('/api/logs', (req, res) => {
 });
 app.get('/api/state', (req, res) => res.json(state));
 
-app.listen(PORT, () => {
-    console.log(`\n📊 APEX Protocol Dashboard running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`\n📊 APEX Protocol Dashboard running on http://0.0.0.0:${PORT}`);
 });
