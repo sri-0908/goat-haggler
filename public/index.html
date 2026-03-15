@@ -119,6 +119,48 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 .dd-banner.show{display:flex;}
 .dd-txt{font-size:11px;font-family:var(--mono);color:var(--red);}
 .dd-txt strong{display:block;font-size:13px;margin-bottom:1px;}
+@media (max-width: 600px) {
+  .stats { grid-template-columns: 1fr; }
+  .grid1 { grid-template-columns: 1fr; }
+  .stat, .panel { width: 100%; }
+  .big-val { font-size: 42px; text-align: center; width: 100%; }
+  .risk-meter { width: 100%; margin: 15px 0; }
+  
+  /* Log Toggle Logic */
+  .grid1 > .panel:nth-child(3) { 
+      position: fixed; 
+      bottom: -100%; 
+      left: 0; 
+      width: 100%; 
+      height: 70vh; 
+      z-index: 2000; 
+      transition: bottom 0.3s ease;
+      border-radius: 20px 20px 0 0;
+      background: var(--s2);
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+  }
+  .grid1 > .panel:nth-child(3).show { bottom: 0; }
+  .mobile-log-btn {
+      display: flex !important;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 3000;
+      background: var(--acc2);
+      color: #000;
+      padding: 15px 25px;
+      border-radius: 30px;
+      font-weight: 800;
+      box-shadow: 0 4px 15px rgba(0,229,255,0.4);
+      border: none;
+      font-family: var(--mono);
+      font-size: 12px;
+      cursor: pointer;
+      align-items: center;
+      gap: 8px;
+  }
+}
+.mobile-log-btn { display: none; }
 </style>
 </head>
 <body>
@@ -173,11 +215,18 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
     <div class="ph"><span class="pt">Live Market Yields</span><span class="badge ba" id="scan-badge">LIVE</span></div>
     <div class="yield-body" id="yield-body"></div>
   </div>
-  <div class="panel">
-    <div class="ph"><span class="pt">Agent Activity</span><span class="badge bg">LIVE FEED</span></div>
+  <div class="panel" id="agent-activity-panel">
+    <div class="ph">
+        <span class="pt">Agent Activity</span>
+        <button class="badge bg" id="close-logs" style="background:none; border:none; color:var(--mut); font-size:16px; cursor:pointer; display:none;">✕</button>
+    </div>
     <div class="feed" id="feed"></div>
   </div>
 </div>
+<button class="mobile-log-btn" id="toggle-logs" onclick="toggleMobileLogs()">
+    📜 View Logs
+</button>
+
 <div class="grid2">
   <div class="panel">
     <div class="ph"><span class="pt">AI Reasoning Engine</span><span class="badge bp">THINKING</span></div>
@@ -473,6 +522,20 @@ setTimeout(()=>{
 async function requestPremium(){try{const r=await fetch('/api/premium-rebalance');if(r.status===402){const p=r.headers.get('PAYMENT-REQUIRED');alert(`HTTP 402: Payment Required!\n\nPlease send ${p} to activate Premium Rebalance.`);const s=prompt("Enter x402 Payment Signature (X-PAYMENT):","simulated_x402_sig_demo");if(s){const vr=await fetch('/api/premium-rebalance',{headers:{'X-PAYMENT':s}});const d=await vr.json();if(d.success){alert("⭐ Premium Activated via x402 Protocol!");document.getElementById('prem-btn').style.opacity='0.5';document.getElementById('prem-btn').textContent='PREMIUM ACTIVE';document.getElementById('prem-btn').disabled=true;}}}}catch(e){console.error(e)}}
 setInterval(tick,5000);
 setInterval(pollServer,3000);
+function toggleMobileLogs() {
+    const panel = document.getElementById('agent-activity-panel');
+    const btn = document.getElementById('toggle-logs');
+    const closeBtn = document.getElementById('close-logs');
+    panel.classList.toggle('show');
+    if (panel.classList.contains('show')) {
+        btn.innerHTML = '🔽 Close Logs';
+        closeBtn.style.display = 'block';
+    } else {
+        btn.innerHTML = '📜 View Logs';
+        closeBtn.style.display = 'none';
+    }
+}
+document.getElementById('close-logs').onclick = toggleMobileLogs;
 </script>
 </body>
 </html>

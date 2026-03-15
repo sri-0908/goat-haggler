@@ -140,15 +140,25 @@ async function agentLoop() {
 }
 
 // Task 1: x402 Payment Challenge & Terminal Sign simulation
-async function handleTelegramClawbotRequest() {
-    console.log(`[Clawbot] Incoming request for premium rebalance via Telegram...`);
-    // Simulating the x402 flow mentioned in task:
-    // 1. Issue challenge
-    // 2. Provide non-custodial signing link
-    const paymentRequired = "0.0001 BTC for Premium Intelligence";
-    const signingLink = "https://apex-protocol.com/pay/x402-sign-4552";
+async function handleTelegramClawbotRequest(actionType) {
+    console.log(`[Clawbot] Incoming ${actionType} request via Telegram...`);
     
-    await logDecision('x402_CHALLENGE', `⚠️ Premium Rebalance Requested. ${paymentRequired}. Pay via non-custodial link: ${signingLink}`);
+    if (actionType === 'Manual Rebalance') {
+        const amount = "0.00025"; // Estimated gas for rebalance
+        const paymentLink = requestHagglePayment(amount);
+        
+        await logDecision('TELEGRAM_PAYMENT_REQUIRED', 
+            `⚠️ Manual Rebalance triggered via OpenClaw. Gas payment required: ${amount} BTC. ` +
+            `Secure x402 Link: ${paymentLink}`
+        );
+        return paymentLink;
+    }
+}
+
+function requestHagglePayment(amount) {
+    const recipient = "0xAPEX_PROTOCOL_RESERVE";
+    // Generating a standard PayRam/x402 link
+    return `https://payram.com/pay?amount=${amount}&to=${recipient}&asset=BTC&memo=rebalance_gas_x402`;
 }
 
 const intervalMs = process.env.FAST_MODE === 'true' || process.argv.includes('--fast') ? 5000 : 300000;
